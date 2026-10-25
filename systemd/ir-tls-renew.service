@@ -1,0 +1,12 @@
+# این فایل نمونه است؛ اسکریپت scripts/setup-systemd-timer.sh نسخهٔ نهایی را
+# با مسیرهای صحیح به‌صورت خودکار در /etc/systemd/system/ می‌سازد.
+[Unit]
+Description=IR-TLS Toolkit — certificate renewal
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=CHANGE_ME
+Environment=HOME=/home/CHANGE_ME
+ExecStart=/path/to/tls/scripts/renew-cert.sh /path/to/tls/config/my-domain.env

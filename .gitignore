@@ -1,0 +1,17 @@
+# Local environment / secrets
+config/*.env
+!config/example.env
+
+# acme.sh local state (never commit keys/certs)
+.acme.sh/
+*.key
+*.pem
+*.crt
+*.csr
+
+# logs
+*.log
+
+# OS / editor
+.DS_Store
+*.swp

@@ -1,0 +1,29 @@
+MIT License
+
+Copyright (c) 2026 IR-TLS Toolkit Contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+Use of this Software to request, obtain, or facilitate TLS/SSL certificates
+for domains owned or controlled by a government entity, or by any person or
+entity listed on the U.S. Treasury's Specially Designated Nationals (SDN)
+list, or otherwise subject to comprehensive U.S. sanctions, is explicitly
+outside the intended and supported use of this Software. The authors provide
+no warranty that this Software complies with export control or sanctions
+law in any jurisdiction, and users are solely responsible for ensuring their
+own compliance.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
