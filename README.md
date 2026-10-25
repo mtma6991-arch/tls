@@ -24,16 +24,18 @@
 
 ## ویژگی‌ها
 
+- ✅ **نصب تعاملی تمام‌عیار** — فقط `./install.sh`؛ بقیه را با چند سوال ساده خودش انجام می‌دهد
 - ✅ اعتبارسنجی پیش‌فرض با `DNS-01` (مقاوم در برابر مشکلات شبکهٔ بین‌المللی)
 - ✅ پشتیبانی از چند CA با قابلیت fallback خودکار (Let's Encrypt → ZeroSSL → Buypass)
-- ✅ اسکریپت تشخیص شبکه (`check-connectivity.sh`) که پیش از صدور، وضعیت اتصال به هر CA را می‌سنجد
-- ✅ تمدید خودکار با `systemd timer` یا `cron`
+- ✅ اسکریپت تشخیص شبکه (`check-connectivity.sh`) برای عیب‌یابی در صورت شکست صدور
+- ✅ تنظیم خودکار تمدید گواهی (`systemd timer` یا `cron`، هرکدام در دسترس باشد)
+- ✅ تشخیص خودکار nginx/Apache و نصب گواهی + reload خودکار روی آن‌ها
 - ✅ پشتیبانی از ده‌ها ارائه‌دهندهٔ DNS از طریق `acme.sh` (Cloudflare، Route53، Google Cloud DNS و…) + حالت دستی برای بقیه
 - ✅ بدون وابستگی سنگین — مبتنی بر [acme.sh](https://github.com/acmesh-official/acme.sh) (bash خالص)
 
 ---
 
-## نصب سریع
+## نصب و راه‌اندازی — فقط یک دستور
 
 ```bash
 git clone https://github.com/mtma6991-arch/tls.git
@@ -41,65 +43,38 @@ cd tls
 ./install.sh
 ```
 
-`install.sh` موارد زیر را انجام می‌دهد:
-1. بررسی وابستگی‌ها (`curl`, `cron` یا `systemd`)
-2. نصب `acme.sh` در `$HOME/.acme.sh`
-3. ثبت حساب نزد CA پیش‌فرض (Let's Encrypt)
+همین! بقیهٔ کار را خودِ اسکریپت به‌صورت تعاملی انجام می‌دهد:
 
----
+1. **نصب `acme.sh`** (اگر از قبل نصب نباشد)
+2. **پرسیدن دامنه و ایمیل** شما
+3. **پرسیدن DNS provider** — یک منوی ساده نشان می‌دهد: Cloudflare (پیشنهادی)، ارائه‌دهندهٔ دیگر، یا حالت دستی؛ کافی است عدد گزینه و (در صورت نیاز) توکن API را وارد کنید
+4. **ساخت خودکار فایل پیکربندی** در `config/`
+5. **صدور گواهی** با DNS-01 و fallback بین چند CA
+6. **تنظیم تمدید خودکار** (می‌پرسد بله/خیر)
+7. **نصب خودکار روی nginx یا Apache** در صورت شناسایی وب‌سرور — فایل‌های گواهی را در جای درست می‌گذارد و reload را هم فعال می‌کند؛ فقط دو خط config به شما نشان می‌دهد که باید دستی به فایل سرور خودتان اضافه کنید
 
-## استفاده
+در پایان، گواهی صادرشده (fullchain + private key) این‌جا قرار می‌گیرد:
 
-### ۱) تنظیم پیکربندی
-
-```bash
-cp config/example.env config/my-domain.env
-nano config/my-domain.env
+```
+$HOME/.acme.sh/<domain>_ecc/
 ```
 
-مقادیر لازم:
-
-```ini
-DOMAIN="example.ir"
-EMAIL="you@example.com"
-DNS_PROVIDER="dns_cf"        # نام پلاگین acme.sh برای DNS شما؛ لیست کامل: docs/DNS-PROVIDERS.md
-CA_SERVER="letsencrypt"      # letsencrypt | zerossl | buypass
-
-# کلیدهای API مخصوص ارائه‌دهندهٔ DNS شما (نمونه برای Cloudflare):
-CF_Token="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-CF_Account_ID="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-```
-
-### ۲) بررسی وضعیت شبکه (اختیاری ولی توصیه‌شده)
+### اگر صدور گواهی شکست خورد
 
 ```bash
 ./scripts/check-connectivity.sh example.ir
 ```
 
-این اسکریپت گزارش می‌دهد که آیا دسترسی به سرورهای هر CA برقرار است و کدام روش اعتبارسنجی احتمال موفقیت بیشتری دارد.
+این اسکریپت گزارش می‌دهد دسترسی به سرورهای هر CA برقرار است یا نه. راهنمای کامل عیب‌یابی: [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md)
 
-### ۳) صدور گواهی
+### استفادهٔ پیشرفته (دامنهٔ دوم، تمدید دستی، اجرای مجدد)
+
+اگر `install.sh` را دوباره اجرا کنید، می‌توانید دامنهٔ دیگری اضافه کنید (فایل config جداگانه می‌سازد). برای کار مستقیم با فایل پیکربندی، بدون پرسش‌های تعاملی:
 
 ```bash
+cp config/example.env config/my-domain.env   # و مقادیرش را دستی پر کنید
 ./scripts/issue-cert.sh config/my-domain.env
-```
-
-### ۴) تمدید خودکار
-
-```bash
-sudo ./scripts/setup-systemd-timer.sh config/my-domain.env
-```
-
-یا به‌صورت دستی با cron:
-
-```cron
-0 3 * * * /path/to/tls/scripts/renew-cert.sh /path/to/tls/config/my-domain.env >> /var/log/ir-tls-renew.log 2>&1
-```
-
-گواهی‌های صادرشده (fullchain + private key) در مسیر زیر قرار می‌گیرند:
-
-```
-$HOME/.acme.sh/<domain>_ecc/
+./scripts/renew-cert.sh config/my-domain.env
 ```
 
 ---
